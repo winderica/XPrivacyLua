@@ -240,8 +240,10 @@ public class XLua implements IXposedHookZygoteInit, IXposedHookLoadPackage {
 
     private void hookApplication(final XC_LoadPackage.LoadPackageParam lpparam) throws Throwable {
         final int uid = Process.myUid();
-        Class<?> at = Class.forName("android.app.LoadedApk", false, lpparam.classLoader);
-        XposedBridge.hookAllMethods(at, "makeApplication", new XC_MethodHook() {
+        Class<?> at = Class.forName("android.app.Instrumentation", false, lpparam.classLoader);
+        Method mNewApplication = at.getMethod("newApplication", ClassLoader.class, String.class, Context.class);
+
+        XposedBridge.hookMethod(mNewApplication, new XC_MethodHook() {
             private boolean made = false;
 
             @Override
